@@ -1,4 +1,4 @@
-import * as actionTypes from '../actions/actions';
+import * as actionTypes from '../actions/actionTypes';
 
 const reducer = (state = [], action) => {
   if (action.type === actionTypes.STORE_RESULT) {

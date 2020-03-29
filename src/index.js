@@ -6,20 +6,26 @@ import registerServiceWorker from './registerServiceWorker';
 import reducer from './store/reducers';
 import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
 
 const logger = store => {
   return next => {
+    console.log('[MiddleWare] Dispatching next', next);
     return action => {
       console.log('[MiddleWare] Dispatching', action);
       const result = next(action);
+      console.log('[MiddleWare]', result);
       console.log('[MiddleWare] next state', store.getState());
-      return 0;
+      return result; // Why is it here ? what does it do ?
     };
   };
 };
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-const store = createStore(reducer, composeEnhancers(applyMiddleware(logger)));
+const store = createStore(
+  reducer,
+  composeEnhancers(applyMiddleware(logger, thunk))
+);
 
 ReactDOM.render(
   <Provider store={store}>
