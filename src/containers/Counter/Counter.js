@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
-
+import { connect } from 'react-redux';
 import CounterControl from '../../components/CounterControl/CounterControl';
 import CounterOutput from '../../components/CounterOutput/CounterOutput';
-
+import {
+  increment,
+  decrement,
+  add,
+  subtract,
+  storeResult,
+  deleteResult
+} from '../../store/actions/actions';
 class Counter extends Component {
   state = {
     counter: 0
@@ -34,28 +41,81 @@ class Counter extends Component {
   };
 
   render() {
+    console.log(this.props);
     return (
       <div>
-        <CounterOutput value={this.state.counter} />
+        <CounterOutput value={this.props.ctr} />
         <CounterControl
           label="Increment"
-          clicked={() => this.counterChangedHandler('inc')}
+          clicked={this.props.onIncrementCounter}
         />
         <CounterControl
           label="Decrement"
-          clicked={() => this.counterChangedHandler('dec')}
+          clicked={this.props.onDecrementCounter}
         />
         <CounterControl
           label="Add 5"
-          clicked={() => this.counterChangedHandler('add', 5)}
+          clicked={() => this.props.onAddCounter(5)}
         />
         <CounterControl
           label="Subtract 5"
-          clicked={() => this.counterChangedHandler('sub', 5)}
+          clicked={() => this.props.onSubCounter(5)}
         />
+        <button onClick={() => this.props.onStoreResult(this.props.ctr)}>
+          {' '}
+          Store Result
+        </button>
+        <ul>
+          {this.props.storedResults.map(strResult => (
+            <li
+              id={strResult.id}
+              onClick={() => this.props.onDeleteResult(strResult.id)}
+            >
+              {strResult.value}
+            </li>
+          ))}
+        </ul>
       </div>
     );
   }
 }
 
-export default Counter;
+const mapStateToProps = state => {
+  console.log(state);
+  return {
+    ctr: state.counter,
+    storedResults: state.results
+  };
+};
+
+// This is a function, requires manual dispatching
+const mapDispatchToProps = dispatch => {
+  return {
+    onIncrementCounter: () => dispatch(increment()),
+    onDecrementCounter: () => dispatch(decrement()),
+    onAddCounter: val => dispatch(add(val)),
+    onSubCounter: val => dispatch(subtract(val)),
+    onStoreResult: result => dispatch(storeResult(result)),
+    onDeleteResult: id => dispatch(deleteResult(id))
+  };
+};
+
+// mapping of propsNames to action creator, this is an object. Does not require dispatch for sync requests
+// const alternate = {
+//   onIncrementCounter: () => ({
+//     type: actionTypes.INCREMENT
+//   }),
+//   onDecrementCounter: () => ({
+//     type: actionTypes.DECREMENT
+//   }),
+//   onAddCounter: val => ({ type: actionTypes.ADD, value: val }),
+//   onSubCounter: val => ({ type: actionTypes.SUBTRACT, value: val }),
+//   onStoreResult: () => ({ type: actionTypes.STORE_RESULT }),
+//   onDeleteResult: id => ({
+//     type: actionTypes.DELETE_RESULT,
+//     resultElementId: id
+//   })
+// };
+
+// export default connect(mapStateToProps, alternate)(Counter);
+export default connect(mapStateToProps, mapDispatchToProps)(Counter);
