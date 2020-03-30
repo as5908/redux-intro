@@ -6,9 +6,10 @@ export const saveResult = result => {
 export const storeResult = result => {
   // console.log(result);
   // return { type: STORE_RESULT, result: result };
-  return function(dispatch) {
+  return function(dispatch, getState) {
     setTimeout(() => {
-      dispatch(saveResult(result));
+      console.log('****************', getState());
+      dispatch(saveResult(getState().counter));
     }, 2000);
   };
 };
